@@ -10,8 +10,43 @@ graph::graph()
     this->connections = new int*[0];
     this->rowCount = 0;
     this->columnCount = 0;
-    this->startPoint = -1;
-    this->endPoint = -1;
+    this->startPoint = new int -1;
+    this->endPoint = startPoint;
+}
+
+int** graph::GetConnections()
+{
+    return this->connections;
+}
+
+void graph::SetStartPoint(int* arg)
+{
+    this->startPoint = arg;
+}
+
+int* graph::GetEndPoint()
+{
+    return this->endPoint;
+}
+
+int* graph::GetStartPoint()
+{
+    return this->startPoint;
+}
+
+void graph::SetEndPoint(int* arg)
+{
+    this->endPoint = arg;
+}
+
+int* graph::GetRowCount()
+{
+    return this->rowCount;
+}
+
+int* graph::GetColumnCount()
+{
+    return this->columnCount;
 }
 
 void graph::Init(int* row, int* column)
@@ -54,7 +89,6 @@ tile::tile(int* r, int* c)
 };
 
 int test = 0;
-
 graph* g = new graph();
 int moveCount = 0;
 int nodesLeftInLayer = 1;
@@ -69,15 +103,21 @@ bool** visited;
 
 void DrawGrid(bool* query)
 {
-    cout << format("end point set to {} \n", g->endPoint);
-    cout << format("start point is set to {} \n", g->startPoint);
+    int* endPoint = g->GetEndPoint();
+    int* startPoint = g->GetStartPoint();
+    int* rowCount = g->GetRowCount();
+    int* columnCount = g->GetColumnCount();
+    int** connections = g->GetConnections();
+
+    cout << format("end point set to {} \n", *endPoint);
+    cout << format("start point is set to {} \n", *startPoint);
     int counter = 0;
-    for (int i = 0; i < *g->rowCount; i++)
+    for (int i = 0; i < *rowCount; i++)
     {
-        for (int j = 0; j < *g->columnCount; j++)
+        for (int j = 0; j < *columnCount; j++)
         {
             counter++;
-            if (g->connections[i][j] == -1)
+            if (connections[i][j] == -1)
             {
                 if (counter < 10)
                 {
@@ -89,7 +129,7 @@ void DrawGrid(bool* query)
                 }
                 
             }
-            else if (g->connections[i][j] == 1 && counter != g->startPoint && counter != g->endPoint)
+            else if (connections[i][j] == 1 && counter != *startPoint && counter != *endPoint)
             {
                 if (counter < 10)
                 {
@@ -103,7 +143,7 @@ void DrawGrid(bool* query)
             }
             else
             {
-                if (counter == g->endPoint)
+                if (counter == *endPoint)
                 {
                     if (counter < 10)
                     {
@@ -115,7 +155,7 @@ void DrawGrid(bool* query)
                     }
                     
                 }
-                else if (counter == g->startPoint)
+                else if (counter == *startPoint)
                 {
                     if (counter < 10)
                     {
@@ -153,20 +193,25 @@ void DrawGrid(bool* query)
         tile* test = FindTile(g, &find);
         int* item = GetTileValue(&find, g);
         cout << format("array item is {}, adjacency matrix id r: {} d:{} \n", *item, *test->row, *test->col);
+        int* result = Solve(startPoint, &find, g);
+        cout << format("moves to solve: {} \n", *result);
+        DrawGrid(query);
     }
 
 }
 
 bool** InitVisited(bool** visited, graph* g)
 {
-    visited = new bool* [*g->rowCount];
-    for (int c = 0; c < *g->columnCount; c++)
+    int* rowCount = g->GetRowCount();
+    int* columnCount = g->GetColumnCount();
+    visited = new bool* [*rowCount];
+    for (int c = 0; c < *columnCount; c++)
     {
-        visited[c] = new bool [*g->columnCount];
+        visited[c] = new bool [*columnCount];
     }
-    for (int i = 0; i < *g->rowCount; i++)
+    for (int i = 0; i < *rowCount; i++)
     {
-        for (int j = 0; j < *g->columnCount; j++)
+        for (int j = 0; j < *columnCount; j++)
         {
             visited[i][j] = false;
         }
@@ -177,9 +222,9 @@ bool** InitVisited(bool** visited, graph* g)
 tile* FindTile(graph* graph, int* id)
 {
     int count = 0;
-    for (int i = 0; i < *graph->rowCount; i++)
+    for (int i = 0; i < *graph->GetRowCount(); i++)
     {
-        for (int j = 0; j < *graph->columnCount; j++)
+        for (int j = 0; j < *graph->GetColumnCount(); j++)
         {
             count++;
             if (count == *id)
@@ -194,56 +239,62 @@ tile* FindTile(graph* graph, int* id)
 
 int* SetStartPoint(graph* g)
 {
+    int** connections = g->GetConnections();
     int rChoice = 0;
     int cChoice = 0;
-    rChoice = rand() % *g->rowCount;
-    cChoice = rand() % *g->columnCount;
-    if (g->connections[rChoice][cChoice] == -1 || g->connections[rChoice][cChoice] == g->endPoint)
+    rChoice = rand() % *g->GetRowCount();
+    cChoice = rand() % *g->GetColumnCount();
+    if (connections[rChoice][cChoice] == -1 || connections[rChoice][cChoice] == *g->GetEndPoint())
     {
         SetStartPoint(g);
     }
     else
     {
-        g->startPoint = *GetTileIndex(&rChoice, &cChoice, g);
-        return &g->startPoint;
+        int* startPoint = GetTileIndex(&rChoice, &cChoice, g);
+        g->SetStartPoint(startPoint);
+        return startPoint;
     }
 }
 
 int* SetEndPoint(graph* g)
 {
+    int* rowCount = g->GetRowCount();
+    int* columnCount = g->GetColumnCount();
     int rChoice = 0;
     int cChoice = 0;
-    rChoice = rand() % *g->rowCount;
-    cChoice = rand() % *g->columnCount;
-    if (g->connections[rChoice][cChoice] == -1)
+    rChoice = rand() % *rowCount;
+    cChoice = rand() % *columnCount;
+    if (g->GetConnections()[rChoice][cChoice] == -1)
     {
         SetEndPoint(g);
     }
     else
     {
-        g->endPoint = *GetTileIndex(&rChoice, &cChoice, g);
-        return &g->endPoint;
+        int* endPoint = GetTileIndex(&rChoice, &cChoice, g);
+        g->SetEndPoint(endPoint);
+        return endPoint;
     }
 }
 
 int* GetTileIndex(int* row, int* col, graph* g)
 {
-    int result = ((*row * *g->rowCount) + *col);
-    return &result;
+    int* result = new int ((*row * *g->GetRowCount()) + *col);
+    return result;
 }
 
 int* GetTileValue(int* arg, graph* g)
 {
     int counter = 0;
     int* result = nullptr;
-    for (int i = 0; i < *g->rowCount; i++)
+    int* columnCount = g->GetColumnCount();
+    for (int i = 0; i < *g->GetRowCount(); i++)
     {
-        for (int j = 0; j < *g->columnCount; j++)
+        for (int j = 0; j < *g->GetColumnCount(); j++)
         {
             counter++;
-            if ((i * *g->columnCount) + j + 1 == *arg)
+            if ((i * *columnCount) + j + 1 == *arg)
             {
-                result = &g->connections[i][j];
+                result = &g->GetConnections()[i][j];
             }
         }
     }
@@ -252,13 +303,14 @@ int* GetTileValue(int* arg, graph* g)
 
 int* GetIndex(int* a, int* b)
 {
+    int* rowCount = g->GetRowCount();
     int count = -1;
-    for (int i = 0; i < *g->rowCount; i++)
+    for (int i = 0; i < *rowCount; i++)
     {
-        for (int j = 0; j < *g->columnCount; j++)
+        for (int j = 0; j < *g->GetColumnCount(); j++)
         {
             count++;
-            int index = (*a * *g->rowCount) + *b;
+            int index = (*a * *rowCount) + *b;
             if (count == index)
             {
                 return &count;
@@ -311,6 +363,9 @@ int* Solve(int* start, int* end, graph* g)
 
 void ExploreNeighbors(int* r, int* c)
 {
+    int* rowCount = g->GetRowCount();
+    int* columnCount = g->GetColumnCount();
+    int** connections = g->GetConnections();
     for (int i = 0; i < 4; i++)
     {
         int rr = *r + directionRow[i];
@@ -321,7 +376,7 @@ void ExploreNeighbors(int* r, int* c)
         {
             continue;
         }
-        if (rr >= *g->rowCount || cc >= *g->columnCount)
+        if (rr >= *rowCount || cc >= *columnCount)
         {
             continue;
         }
@@ -330,8 +385,8 @@ void ExploreNeighbors(int* r, int* c)
         bool targetVisited = visited[rr][cc];
         if (targetVisited == true)
         {
-            g->connections[rr][cc] = 1;
-            if (*targetIndex == g->endPoint)
+            connections[rr][cc] = 1;
+            if (*targetIndex == *g->GetEndPoint())
             {
                 reachedEnd = true;
                 break;
@@ -340,7 +395,7 @@ void ExploreNeighbors(int* r, int* c)
         }
 
         // avoid obstacles
-        if (g->connections[rr][cc] == -1)
+        if (connections[rr][cc] == -1)
         {
             continue;
         }
@@ -367,10 +422,12 @@ int main()
 
     bool drawGrid = true;
     DrawGrid(&drawGrid);
+    /*
     int* result = Solve(&g->startPoint, &g->endPoint, g);
     drawGrid = false;
     DrawGrid(&drawGrid);
     cout << format("moves to solve: {}", *result);
+    */
     // int* result = GetIndex(&testRow, &testCol, &g);
     // cout << format("row {} col {} is id {}", testRow, testCol, *result);
     return 0;
