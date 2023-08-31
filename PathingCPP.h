@@ -21,13 +21,12 @@ public:
 };
 int* SetEndPoint(graph* g);
 int* SetStartPoint(graph* g);
-int* GetArrayIndex(int* row, int* col, graph* g);
-int* GetArrayItem(int* arg, graph* g);
-int* solve(int* start, int* end, graph* g);
+int* GetTileIndex(int* row, int* col, graph* g);
+int* GetTileValue(int* arg, graph* g);
+int* Solve(int* start, int* end, graph* g);
 tile* FindTile(graph* graph, int* id);
 int* GetIndex(int* a, int* b);
 void ExploreNeighbors(int* r, int* c);
 void DrawGrid(bool* query);
-void clrscr();
 
 bool** InitVisited(bool** arg, graph* g);

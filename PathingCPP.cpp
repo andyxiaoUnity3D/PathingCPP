@@ -1,6 +1,3 @@
-// PathingCPP.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 #include <format>
 #include <queue>
@@ -69,10 +66,6 @@ int* directionCol = new int[] {0, 0, 1, -1};
 bool reachedEnd = false;
 bool** visited;
 
-void clrscr()
-{
-    cout << "\033[2J\033[1;1H";
-}
 
 void DrawGrid(bool* query)
 {
@@ -158,7 +151,7 @@ void DrawGrid(bool* query)
 
         cout << format("Query is :{} \n", find);
         tile* test = FindTile(g, &find);
-        int* item = GetArrayItem(&find, g);
+        int* item = GetTileValue(&find, g);
         cout << format("array item is {}, adjacency matrix id r: {} d:{} \n", *item, *test->row, *test->col);
     }
 
@@ -211,7 +204,7 @@ int* SetStartPoint(graph* g)
     }
     else
     {
-        g->startPoint = *GetArrayIndex(&rChoice, &cChoice, g);
+        g->startPoint = *GetTileIndex(&rChoice, &cChoice, g);
         return &g->startPoint;
     }
 }
@@ -228,18 +221,18 @@ int* SetEndPoint(graph* g)
     }
     else
     {
-        g->endPoint = *GetArrayIndex(&rChoice, &cChoice, g);
+        g->endPoint = *GetTileIndex(&rChoice, &cChoice, g);
         return &g->endPoint;
     }
 }
 
-int* GetArrayIndex(int* row, int* col, graph* g)
+int* GetTileIndex(int* row, int* col, graph* g)
 {
     int result = ((*row * *g->rowCount) + *col);
     return &result;
 }
 
-int* GetArrayItem(int* arg, graph* g)
+int* GetTileValue(int* arg, graph* g)
 {
     int counter = 0;
     int* result = nullptr;
@@ -276,7 +269,7 @@ int* GetIndex(int* a, int* b)
     return &count;
 }
 
-int* solve(int* start, int* end, graph* g)
+int* Solve(int* start, int* end, graph* g)
 {
     tile* startTile = FindTile(g, start);
     rQueue.push(*startTile->row);
@@ -307,15 +300,6 @@ int* solve(int* start, int* end, graph* g)
 
         rQueue.pop();
         cQueue.pop();
-
-        if (!reachedEnd)
-        {
-            bool query = true;
-            DrawGrid(&query);
-        }
-        
-        
-
     }
     if (reachedEnd)
     {
@@ -383,7 +367,7 @@ int main()
 
     bool drawGrid = true;
     DrawGrid(&drawGrid);
-    int* result = solve(&g->startPoint, &g->endPoint, g);
+    int* result = Solve(&g->startPoint, &g->endPoint, g);
     drawGrid = false;
     DrawGrid(&drawGrid);
     cout << format("moves to solve: {}", *result);
