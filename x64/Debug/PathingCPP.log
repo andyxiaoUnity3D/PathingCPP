@@ -1,0 +1,9 @@
+﻿  PathingCPP.cpp
+F:\PathingCPP\PathingCPP.cpp(35,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+F:\PathingCPP\PathingCPP.cpp(234): warning C4715: 'SetEndPoint': not all control paths return a value
+F:\PathingCPP\PathingCPP.cpp(239): warning C4172: returning address of local variable or temporary: result
+F:\PathingCPP\PathingCPP.cpp(217): warning C4715: 'SetStartPoint': not all control paths return a value
+F:\PathingCPP\PathingCPP.cpp(271): warning C4172: returning address of local variable or temporary: count
+F:\PathingCPP\PathingCPP.cpp(276): warning C4172: returning address of local variable or temporary: count
+F:\PathingCPP\PathingCPP.cpp(325): warning C4172: returning address of local variable or temporary: result
+  PathingCPP.vcxproj -> F:\PathingCPP\x64\Debug\PathingCPP.exe
